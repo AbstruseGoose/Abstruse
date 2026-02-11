@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  DATABASE_URL: z.string().url(),
-  NEXTAUTH_SECRET: z.string().min(32),
-  NEXTAUTH_URL: z.string().url(),
-  MFA_ENCRYPTION_KEY: z.string().min(32),
+  NODE_ENV: z.enum(["development", "test", "production"]).optional(),
+  DATABASE_URL: z.string().url().optional(),
+  NEXTAUTH_SECRET: z.string().min(32).optional(),
+  NEXTAUTH_URL: z.string().url().optional(),
+  MFA_ENCRYPTION_KEY: z.string().min(32).optional(),
   SEED_ADMIN_EMAIL: z.string().email().optional(),
   SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
   SEED_ADMIN_NAME: z.string().optional(),
@@ -20,10 +20,12 @@ const envSchema = z.object({
   SMTP_PORT: z.string().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
-  SMTP_FROM: z.string().optional()
+  SMTP_FROM: z.string().optional(),
 });
 
-export const env = envSchema.parse({
+export type Env = z.infer<typeof envSchema>;
+
+const parsed = envSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
   DATABASE_URL: process.env.DATABASE_URL,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
@@ -43,5 +45,15 @@ export const env = envSchema.parse({
   SMTP_PORT: process.env.SMTP_PORT,
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASSWORD: process.env.SMTP_PASSWORD,
-  SMTP_FROM: process.env.SMTP_FROM
+  SMTP_FROM: process.env.SMTP_FROM,
 });
+
+export const env: Env = parsed.success ? parsed.data : {};
+
+export function requireEnv<K extends keyof Env>(key: K) {
+  const value = env[key];
+  if (!value) {
+    throw new Error(`Missing environment variable: ${String(key)}`);
+  }
+  return value;
+}

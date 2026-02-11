@@ -1,13 +1,13 @@
 import argon2 from "argon2";
 import crypto from "node:crypto";
 import { authenticator } from "otplib";
-import { env } from "./env";
+import { requireEnv } from "./env";
 
 const ALGO = "aes-256-gcm";
 const IV_LENGTH = 12;
 
 function getEncryptionKey() {
-  const key = Buffer.from(env.MFA_ENCRYPTION_KEY, "base64");
+  const key = Buffer.from(requireEnv("MFA_ENCRYPTION_KEY"), "base64");
   if (key.length !== 32) {
     throw new Error("MFA_ENCRYPTION_KEY must be 32 bytes base64 encoded.");
   }
