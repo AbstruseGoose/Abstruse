@@ -40,7 +40,8 @@ export function RichTextEditor({ name, initialValue = "" }: RichTextEditorProps)
     ],
     content: "",
     onUpdate({ editor }) {
-      const next = editor.storage.markdown.getMarkdown();
+      const storage = editor.storage as { markdown?: { getMarkdown: () => string } };
+      const next = storage.markdown?.getMarkdown() ?? "";
       setMarkdown(next);
     },
   });
