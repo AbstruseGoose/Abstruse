@@ -52,7 +52,7 @@ export function RichTextEditor({ name, initialValue = "" }: RichTextEditorProps)
 
     markdownToHtml(initialValue).then((html) => {
       if (cancelled) return;
-      editor.commands.setContent(html, false);
+      editor.commands.setContent(html, { emitUpdate: false });
       setMarkdown(initialValue);
     });
 
