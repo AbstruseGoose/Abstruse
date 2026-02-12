@@ -138,3 +138,19 @@ model SiteSetting {
   valueJson Json
   updatedAt DateTime @updatedAt
 }
+
+model InviteToken {
+  id          String   @id @default(cuid())
+  email       String
+  role        Role     @default(ADMIN)
+  tokenHash   String   @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([expiresAt])
+}

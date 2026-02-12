@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth-guard";
 import { Card } from "@/components/ui/card";
@@ -22,6 +23,14 @@ export default async function UsersAdminPage() {
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-muted">Admin</p>
         <h1 className="mt-2 text-3xl font-semibold">Users</h1>
+      </div>
+      <div>
+        <Link
+          href="/admin/users/invite"
+          className="rounded-xl border border-border/60 px-4 py-2 text-xs uppercase tracking-[0.2em] text-muted transition hover:text-foreground"
+        >
+          Invite admin
+        </Link>
       </div>
 
       <div className="grid gap-4">
