@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db";
+import type { AuditLog } from "@prisma/client";
 import { requireAdmin } from "@/lib/auth-guard";
 import { Card } from "@/components/ui/card";
 
 export default async function AuditLogPage() {
   await requireAdmin();
-  const logs = await prisma.auditLog.findMany({
+  const logs: AuditLog[] = await prisma.auditLog.findMany({
     orderBy: [{ createdAt: "desc" }],
     take: 50,
   });
