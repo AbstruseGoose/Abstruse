@@ -31,6 +31,7 @@ model User {
   name               String?
   role               Role       @default(EDITOR)
   passwordHash       String
+  mustChangePassword Boolean    @default(false)
   mfaEnabled         Boolean    @default(false)
   mfaSecretEncrypted String?
   createdAt          DateTime   @default(now())
@@ -38,6 +39,7 @@ model User {
   lastLoginAt        DateTime?
   disabled           Boolean    @default(false)
   auditLogs          AuditLog[]
+  createdInvites     InviteToken[] @relation("InviteCreatedBy")
 
   @@index([role])
 }
@@ -149,7 +151,7 @@ model InviteToken {
   createdById String?
   createdAt   DateTime @default(now())
 
-  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy   User?    @relation("InviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([email])
   @@index([expiresAt])

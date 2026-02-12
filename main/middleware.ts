@@ -7,12 +7,19 @@ import { isAdmin } from "@/lib/rbac";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/portal") || pathname.startsWith("/api/admin")) {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/portal") || pathname.startsWith("/api/admin") || pathname.startsWith("/auth/change-password") || pathname.startsWith("/api/auth/change-password")) {
     const token = await getToken({ req: request, secret: env.NEXTAUTH_SECRET });
 
     if (!token) {
       const signInUrl = new URL("/auth/sign-in", request.url);
       return NextResponse.redirect(signInUrl);
+    }
+
+    const mustChangePassword = Boolean(token.mustChangePassword);
+    const isPasswordRoute = pathname.startsWith("/auth/change-password") || pathname.startsWith("/api/auth/change-password");
+    if (mustChangePassword && !isPasswordRoute) {
+      const changeUrl = new URL("/auth/change-password", request.url);
+      return NextResponse.redirect(changeUrl);
     }
 
     if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
@@ -35,5 +42,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/portal/:path*", "/api/admin/:path*"]
+  matcher: [
+    "/admin/:path*",
+    "/portal/:path*",
+    "/api/admin/:path*",
+    "/auth/change-password",
+    "/api/auth/change-password",
+  ]
 };

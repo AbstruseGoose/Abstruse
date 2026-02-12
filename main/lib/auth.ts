@@ -69,6 +69,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           role: user.role,
           mfaEnabled: user.mfaEnabled,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -76,10 +77,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const typedUser = user as unknown as { id?: string; role?: string; mfaEnabled?: boolean };
+        const typedUser = user as unknown as {
+          id?: string;
+          role?: string;
+          mfaEnabled?: boolean;
+          mustChangePassword?: boolean;
+        };
         token.id = typedUser.id ?? token.id;
         token.role = typedUser.role;
         token.mfaEnabled = typedUser.mfaEnabled;
+        token.mustChangePassword = typedUser.mustChangePassword;
       }
       return token;
     },
@@ -88,6 +95,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.mfaEnabled = Boolean(token.mfaEnabled);
+        session.user.mustChangePassword = Boolean(token.mustChangePassword);
       }
       return session;
     },
